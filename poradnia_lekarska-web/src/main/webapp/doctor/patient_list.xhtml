@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:body>
+        <h:outputScript target="body" />
+
+        <ui:composition template="./../WEB-INF/pageTemplate.xhtml">
+
+            <ui:define name="content">
+                
+                <h:form id="patientsForm">
+                    <p:dataTable id="patientTable" value="#{patientBean.patients}" var="item" sortMode="multiple" rowKey="#{item.id}">
+                        
+                        <f:param name="ID" value="#{item.id}" />
+                        <p:column sortBy="#{item.id}" headerText="Id">
+                            <h:outputText value="#{item.id}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.name}" headerText="Name">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.surname}" headerText="Surname">
+                            <h:outputText value="#{item.surname}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.addres}" headerText="Addres">
+                            <h:outputText value="#{item.addres}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.mail}" headerText="Mail">
+                            <h:outputText value="#{item.mail}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.phone}" headerText="Phone">
+                            <h:outputText value="#{item.phone}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.pesel}" headerText="Pesel">
+                            <h:outputText value="#{item.pesel}"/>
+                        </p:column>
+                        <p:column headerText="Actions" >
+                            <p:commandButton icon="ui-icon-trash" title="Remove" action="#{patientBean.onRemovePatient(item)}" oncomplete="PF('PatientRemoveDlg').show();" update="patientTable" />
+                            <p:commandButton icon="ui-icon-update" title="Update" action="#{patientBean.onUpdatePatient(item)}" oncomplete="PF('PatientAddDlg').show();"/>
+                            <p:button outcome="/doctor/patient_item" title="Detail" icon="ui-icon-star">
+                                <f:param name="ID" value="#{item.id}" />
+                            </p:button>
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandButton icon="ui-icon-add" title="Add" action="#{patientBean.onAddPatient()}" oncomplete="PF('PatientAddDlg').show();"/>
+                </h:form>          
+                <p:dialog id="PatientAddDlgId" widgetVar="PatientAddDlg" dynamic="true" modal="true" >
+                    <h:form>
+                        <h1><h:outputText value="Create/Edit"/></h1>
+                        <p:messages autoUpdate="true"  />
+                        <p:panelGrid columns="2" >
+                            <p:outputLabel value="Name:" for="name" />
+                            <p:inputText id="name" value="#{patientBean.newPatient.name}" title="Name" />
+                            <p:outputLabel value="Surname:" for="surname" />
+                            <p:inputText id="surname" value="#{patientBean.newPatient.surname}" title="Surname" />
+                            <p:outputLabel value="Addres:" for="addres" />
+                            <p:inputText id="addres" value="#{patientBean.newPatient.addres}" title="Addres" />
+                            <p:outputLabel value="Mail:" for="mail" />
+                            <p:inputText id="mail" value="#{patientBean.newPatient.mail}" title="Mail" />
+                            <p:outputLabel value="Phone:" for="phone" />
+                            <p:inputText id="phone" value="#{patientBean.newPatient.phone}" title="Phone" />
+                            <p:outputLabel value="Pesel:" for="pesel" />
+                            <p:inputText id="pesel" value="#{patientBean.newPatient.pesel}" title="Pesel" />
+                        </p:panelGrid>
+                        <p:commandButton value="Cancel" type="button" onclick="PF('PatientAddDlg').hide()" />
+                        <p:commandButton value="Ok" action="#{patientBean.onPatientAdded}"  update=":patientsForm:patientTable" />
+                    </h:form>
+                </p:dialog>
+                <p:dialog id="PatientRemoveDlgId" widgetVar="PatientRemoveDlg" dynamic="true" modal="true" >
+                    <h:form>
+                        Delete patient?
+                        <p:commandButton value="Cancel" type="button" onclick="PF('PatientRemoveDlg').hide()"  update=":PatientAddDlgId"/>
+                        <p:commandButton value="Ok" action="#{patientBean.onRemovedPatient}" update=":patientsForm:patientTable" />
+                    </h:form>
+                </p:dialog>
+            </ui:define>
+
+        </ui:composition>
+
+    </h:body>
+</html>

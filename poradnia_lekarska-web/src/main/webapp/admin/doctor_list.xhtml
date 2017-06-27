@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:body>
+        <h:outputScript target="body" />
+
+        <ui:composition template="./../WEB-INF/pageTemplate.xhtml">
+
+            <ui:define name="content">
+                <h:form id="doctorsForm">
+                    <p:dataTable id="doctorTable" value="#{doctorBean.doctors}" var="doctor" sortMode="multiple">
+                        <p:column sortBy="#{doctor.id}" headerText="ID" >
+                            #{doctor.id}
+                        </p:column>
+                        <p:column sortBy="#{doctor.name}" headerText="Name">
+                            #{doctor.name}
+                        </p:column>
+                        <p:column sortBy="#{doctor.surname}" headerText="Surname">
+                            #{doctor.surname}
+                        </p:column>
+                        <p:column sortBy="#{doctor.mail}" headerText="Mail">
+                            #{doctor.mail}
+                        </p:column>
+                        <p:column sortBy="#{doctor.phone}" headerText="Phone">
+                            #{doctor.phone}
+                        </p:column>
+                        <p:column sortBy="#{doctor.dateOfEmployment}" headerText="Emplyoment date">
+                            <h:outputText id="employment_date" value="#{doctor.dateOfEmployment}" title="Emplyoment date">
+                                <f:convertDateTime pattern="dd.MM.yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{doctor.salary}" headerText="Salary">
+                            <h:outputText id="salary" value="#{doctor.salary} zł" title="Salary">
+                                <f:convertNumber currencyCode="zł" /> 
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Actions" >
+                            <p:commandButton icon="ui-icon-trash" title="Remove" action="#{doctorBean.onRemoveDoctor(doctor)}" oncomplete="PF('DoctorRemoveDlg').show();" update="doctorTable" />
+                            <p:commandButton icon="ui-icon-update" title="Update" action="#{doctorBean.onUpdateDoctor(doctor)}" oncomplete="PF('DoctorAddDlg').show();" update=":DoctorAddDlgId" />
+                            <p:button outcome="/admin/doctor_item" title="Detail" icon="ui-icon-star">
+                                <f:param name="ID" value="#{doctor.id}" />
+                            </p:button>
+                        </p:column>
+                    </p:dataTable>
+                    <p:commandButton icon="ui-icon-add" title="Add" action="#{doctorBean.onAddDoctor()}" oncomplete="PF('DoctorAddDlg').show();" update=":DoctorAddDlgId" />
+                </h:form>
+                <p:dialog id="DoctorAddDlgId" widgetVar="DoctorAddDlg" dynamic="true" modal="true" >
+                    <h:form>
+                        <h1><h:outputText value="Create/Edit"/></h1>
+                        <p:messages autoUpdate="true" />
+                        <p:panelGrid columns="2">
+                            <p:outputLabel value="Name:" for="name" />
+                            <p:inputText id="name" value="#{doctorBean.newDoctor.name}" title="Name" required="true"/>
+                            <p:outputLabel value="Surname:" for="surname" />
+                            <p:inputText id="surname" value="#{doctorBean.newDoctor.surname}" title="Surname" required="true"/>
+                            <p:outputLabel value="Addres:" for="addres" />
+                            <p:inputText id="addres" value="#{doctorBean.newDoctor.addres}" title="Addres" required="true"/>
+                            <p:outputLabel value="Salary:" for="salary" />
+                            <p:inputText id="salary" value="#{doctorBean.newDoctor.salary}" title="Salary" required="true"/>
+                            <p:outputLabel value="Mail:" for="mail" />
+                            <p:inputText id="mail" value="#{doctorBean.newDoctor.mail}" title="Mail" required="true"/>
+                            <p:outputLabel value="Phone:" for="phone" />
+                            <p:inputText id="phone" value="#{doctorBean.newDoctor.phone}" title="Phone" required="true"/>
+                            <p:outputLabel value="DateOfEmployment:" for="dateOfEmployment" />
+                            <p:calendar id="dateOfEmployment" value="#{doctorBean.newDoctor.dateOfEmployment}" showOn="button" title="DateOfEmployment" required="true"/>
+                            <p:outputLabel value="Pesel:" for="pesel" />
+                            <p:inputText id="pesel" value="#{doctorBean.newDoctor.pesel}" title="Pesel"  required="true" />
+                        </p:panelGrid>
+                        <p:commandButton value="Cancel" type="button" onclick="PF('DoctorAddDlg').hide()"  />
+                        <p:commandButton value="Ok" action="#{doctorBean.onDoctorAdded}"  update=":doctorsForm:doctorTable" />
+                    </h:form>
+                </p:dialog>
+                <p:dialog id="DoctorRemoveDlgId" widgetVar="DoctorRemoveDlg" dynamic="true" modal="true" >
+                    <h:form>
+                        Delete doctor?
+                        <p:commandButton value="Cancel" type="button" onclick="PF('DoctorRemoveDlg').hide()" />
+                        <p:commandButton value="Ok" action="#{doctorBean.onRemovedDoctor}" update=":doctorsForm:doctorTable" />
+                    </h:form>
+                </p:dialog>
+                
+                
+            </ui:define>
+
+        </ui:composition>
+
+    </h:body>
+</html>

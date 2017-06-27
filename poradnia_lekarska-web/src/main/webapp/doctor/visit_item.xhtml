@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:body>
+        <h:outputScript target="body" />
+
+        <ui:composition template="./../WEB-INF/pageTemplate.xhtml">
+            
+            <ui:define name="content" >
+                <ui:param name="item" value="#{visitBean.get(param['ID'])}" />
+                <h3>
+                    <h:outputText value="#{item.date}">
+                        <f:convertDateTime pattern="dd.MM.yyyy" />
+                    </h:outputText>,
+                    <h:outputText value="#{item.time}">
+                        <f:convertDateTime pattern="HH:mm" />
+                    </h:outputText>
+                </h3>
+                <h3>
+                    Room <u><h:outputText value="#{item.room}"/></u>
+                </h3>
+                <h4>Payment: </h4><h5> <h:outputText value="#{item.payment}"/> zł</h5>
+                
+                <h4>Doctor: </h4><h5><p:link outcome="/admin/doctor_item.xhtml" value="#{item.idDoctor.fullname()}" >
+                        <f:param name="ID" value="#{item.idDoctor.id}" />
+                </p:link></h5>
+                <h4>Patient: </h4><h5><p:link outcome="/doctor/patient_item.xhtml" value="#{item.idPatient.fullname()}" >
+                        <f:param name="ID" value="#{item.idPatient.id}" />
+                </p:link></h5>    
+                
+                <h4>Podsumowanie</h4>
+                <h:outputText value="#{item.summary}" />
+                
+                    
+                    
+            </ui:define>
+            
+        </ui:composition>
+
+    </h:body>
+</html>

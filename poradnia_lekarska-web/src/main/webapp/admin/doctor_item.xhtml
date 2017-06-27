@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+    <f:metadata>
+         <f:viewAction action="#{doctorBean.onload(param['ID'])}" />
+    </f:metadata>
+    <h:body>
+        <h:outputScript target="body" />
+
+        <ui:composition template="./../WEB-INF/pageTemplate.xhtml">
+            
+            <ui:define name="content" >
+                <h3>Doctor <u><h:outputText value="#{doctorBean.newDoctor.fullname()}" /></u></h3>
+                <h4>Adres: </h4><h5><h:outputText value="#{doctorBean.newDoctor.addres}" /></h5>
+                <h4>Kontakt: </h4><h5>telefon: <h:outputText value="#{doctorBean.newDoctor.phone}" ></h:outputText> <br/>e-mail: <h:outputText value="#{doctorBean.newDoctor.mail}" /></h5>
+                <h4>Data zatrudnienia: </h4><h5><h:outputText value="#{doctorBean.newDoctor.dateOfEmployment}"><f:convertDateTime pattern="dd.MM.yyyy" /></h:outputText> </h5>
+                <h4>Pensja: </h4><h5><h:outputText value="#{doctorBean.newDoctor.salary} zł" /></h5>
+                
+                <h4>Wizyty</h4>
+                <h:form id="visitsForm">
+                    <p:dataTable id="visitTable"  value="#{doctorBean.getNextVisits() }" var="item" sortMode="multiple">
+                        <p:column sortBy="#{item.id}" headerText="Id">
+                            <h:outputText value="#{item.id}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.date}" headerText="Date">
+                            <h:outputText value="#{item.date}">
+                                <f:convertDateTime pattern="dd.MM.yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item.time}" headerText="Time">
+                            <h:outputText value="#{item.time}">
+                                <f:convertDateTime pattern="HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item.room}" headerText="Room">
+                            <h:outputText value="#{item.room}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.idPatient.fullname()}" headerText="Patient">
+                            <p:link outcome="/doctor/patient_item.xhtml" value="#{item.idPatient.fullname()}" >
+                                <f:param name="ID" value="#{item.idPatient.id}" />
+                            </p:link>
+                        </p:column>
+                        <p:column sortBy="#{item.payment}" headerText="Payment">
+                            <h:outputText value="#{item.payment}"/>
+                        </p:column>
+                        <p:column headerText="Action">
+                            <p:commandButton icon="ui-icon-trash" title="Remove" action="#{visitBean.onRemoveVisit(item)}" oncomplete="PF('VisitRemoveDlg').show();" update="visitTable" />
+                            <p:commandButton icon="ui-icon-update" title="Update" action="#{visitBean.onUpdateVisit(item)}" oncomplete="PF('VisitAddDlg').show();" update=":VisitAddDlgId" />
+                            <p:button outcome="/doctor/visit_item" title="Detail" icon="ui-icon-star">
+                                <f:param name="ID" value="#{item.id}" />
+                            </p:button>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+                
+                <h4>Historia wizyt</h4>
+                <h:form id="visitsForm2">
+                    <p:dataTable id="visitTable2"  value="#{doctorBean.getHistoryVisits()}" var="item" sortMode="multiple">
+                        <p:column sortBy="#{item.id}" headerText="Id">
+                            <h:outputText value="#{item.id}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.date}" headerText="Date">
+                            <h:outputText value="#{item.date}">
+                                <f:convertDateTime pattern="dd.MM.yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item.time}" headerText="Time">
+                            <h:outputText value="#{item.time}">
+                                <f:convertDateTime pattern="HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item.room}" headerText="Room">
+                            <h:outputText value="#{item.room}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.idPatient.fullname()}" headerText="Patient">
+                            <p:link outcome="/doctor/patient_item.xhtml" value="#{item.idPatient.fullname()}" >
+                                <f:param name="ID" value="#{item.idPatient.id}" />
+                            </p:link>
+                        </p:column>
+                        <p:column sortBy="#{item.payment}" headerText="Payment">
+                            <h:outputText value="#{item.payment}"/>
+                        </p:column>
+                        <p:column headerText="Action" >
+                            <p:button outcome="/doctor/visit_item" title="Detail" icon="ui-icon-star">
+                                    <f:param name="ID" value="#{item.id}" />
+                            </p:button>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+                <p:dialog id="VisitAddDlgId" widgetVar="VisitAddDlg" dynamic="true" modal="true" >
+                <h:form>
+                    <h1><h:outputText value="Create/Edit"/></h1>
+                    <p:messages autoUpdate="true" />
+                    <p:panelGrid columns="2">
+                        <p:outputLabel value="Doctor" for="idDoctor" />
+                        <h:outputText id="idDoctor" value="#{doctorBean.newDoctor.fullname()}" />
+                        <p:outputLabel value="Doctor" for="idPatient"/>
+                        <p:selectOneMenu id="idPatient" converter="omnifaces.SelectItemsConverter" value="#{visitBean.newVisit.idPatient}" title="IdPatient" onchange="#{visitBean.onChangePatient()}">
+                            <!-- TODO: update below reference to list of available items-->
+                            <f:selectItems value="#{patientBean.patients}" var="entry" itemValue="#{entry}" itemLabel="#{entry.fullname()}" />
+                        </p:selectOneMenu>
+                        <p:outputLabel value="Date:" for="date" />
+                        <p:calendar id="date" value="#{visitBean.newVisit.date}" showOn="button" title="Date" required="true" requiredMessage="The Date field is required." />
+                        <p:outputLabel value="Time:" for="time" />
+                        <pe:timePicker id="time" showOn="button" widgetVar="popupTimeWidget" mode="popup" value="#{visitBean.newVisit.time}" required="true" requiredMessage="The Time field is required.">
+                        </pe:timePicker>
+                        <p:outputLabel value="Room:" for="room" />
+                        <p:inputText id="room" value="#{visitBean.newVisit.room}" title="Room" required="true" requiredMessage="The Room field is required."/>
+                        <p:outputLabel value="Payment:" for="payment" />
+                        <p:inputText id="payment" value="#{visitBean.newVisit.payment}" title="Payment" required="true" requiredMessage="The Payment field is required."/>
+                        <p:outputLabel value="Summary:" for="summary" />
+                        <p:inputTextarea rows="4" cols="30" id="summary" value="#{visitBean.newVisit.summary}" title="Summary" />
+                        <p:commandButton value="Cancel" type="button" onclick="PF('VisitAddDlg').hide()"  />
+                        <p:commandButton value="Ok" action="#{visitBean.onVisitAdded}"  update=":visitsForm:visitTable"  />
+                    </p:panelGrid>
+                </h:form>
+                </p:dialog>>
+                <p:dialog id="VisitRemoveDlgId" widgetVar="VisitRemoveDlg" dynamic="true" modal="true" >
+                    <h:form>
+                        Delete visit?
+                        <p:commandButton value="Cancel" type="button" onclick="PF('VisitRemoveDlg').hide()" />
+                        <p:commandButton value="Ok" action="#{visitBean.onRemovedVisit}" update=":visitsForm:visitTable" />
+                    </h:form>
+                </p:dialog>
+            </ui:define>
+            
+        </ui:composition>
+
+    </h:body>
+</html>
