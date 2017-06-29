@@ -13,6 +13,7 @@ import com.poradnia.poradnia_lekarska.ejb.model.Patient;
 import com.poradnia.poradnia_lekarska.ejb.model.Visit;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
@@ -21,6 +22,7 @@ import javax.faces.view.ViewScoped;
 import java.util.logging.Logger;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 import org.primefaces.context.RequestContext;
 
 /**
@@ -102,15 +104,27 @@ public class visitBean implements Serializable{
         dao.edit(newVisit);
     }
     
-    public void getNextVisitsFree(){
-        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-        
-        Integer hour = Integer.valueOf(params.get("hour1"));
-        Integer min = Integer.valueOf(params.get("minute1"));
-        /*int hour = Integer.valueOf(params.get("hour"));
-        int min = Integer.valueOf(params.get("minute"));*/
-        
-        System.out.println(daod.getVisits(newVisit.getIdDoctor().getId(),newVisit.getDate(),hour,min));
+    public void DoctorChangeListener(ValueChangeEvent event){
+        newVisit.setIdDoctor((Doctor) event.getNewValue());
+        logger.info("Editing visit doctor " + newVisit.getIdDoctor().getId() );
+    }
+    
+    public void DateChangeListener(ValueChangeEvent event){
+        if(newVisit.getDate()!=null){
+            newVisit.setDate((Date) event.getNewValue());
+            logger.info("Editing date visit " + newVisit.getDate() );
+        }
+    }
+    
+    public boolean getNextVisitsFree(int hour, int min){
+        if(newVisit.getIdDoctor()!=null){
+            List<Visit> visits = daod.getVisits(newVisit.getIdDoctor().getId(),newVisit.getDate(),hour,min);
+            logger.info("doctor visits " + visits.toString() );
+            if(visits==null)
+                return true;
+        }
+            
+        return false;
     }
     
     /**

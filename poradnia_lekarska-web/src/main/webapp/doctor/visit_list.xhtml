@@ -65,9 +65,11 @@
                     <p:messages autoUpdate="true" />
                     <p:panelGrid columns="2">
                         <p:outputLabel value="Doctor" for="idDoctor"/>
-                        <p:selectOneMenu id="idDoctor" converter="omnifaces.SelectItemsConverter" value="#{visitBean.newVisit.idDoctor}" title="IdDoctor">
+                        
+                        <p:selectOneMenu id="idDoctor" converter="omnifaces.SelectItemsConverter" value="#{visitBean.newVisit.idDoctor}" title="IdDoctor" valueChangeListener="#{visitBean.DoctorChangeListener}" >
                             <!-- TODO: update below reference to list of available items-->
-                            <f:selectItems value="#{doctorBean.doctors}" var="entry" itemValue="#{entry}" itemLabel="#{entry.fullname()}" />
+                            <p:ajax update=":timeRangeScript" />
+                            <f:selectItems value="#{doctorBean.doctors}" var="entry" itemValue="#{entry}" itemLabel="#{entry.fullname()}"  />
                         </p:selectOneMenu>
                         <p:outputLabel value="Patient" for="idPatient" />
                         <h:panelGroup>
@@ -78,12 +80,14 @@
                             <p:commandButton style="float:right" icon="ui-icon-add" title="Add" action="#{patientBean.onAddPatient()}" oncomplete="PF('PatientAddDlg').show();" update=":PatientAddDlgId" />
                         </h:panelGroup>
                         <p:outputLabel value="Date:" for="date" />
-                        <p:calendar id="date" value="#{visitBean.newVisit.date}" showOn="button" title="Date" required="true" requiredMessage="The Date field is required.">
+                        <p:calendar id="date" value="#{visitBean.newVisit.date}"   showOn="button" title="Date" required="true" requiredMessage="The Date field is required."  valueChangeListener="#{visitBean.DateChangeListener}" >
                             <f:convertDateTime pattern="dd.MM.yyyy" />
+                            <p:ajax update=":timeRangeScript" />
                         </p:calendar>
                         <p:outputLabel value="Time:" for="time" />
                         <pe:timePicker id="time" value="#{visitBean.newVisit.time}" mode="popup" showOn="button"  
-                                       required="true" onHourShow="onHourShowCallback" onMinuteShow="onMinuteShowCallback"/>
+                                       required="true" onHourShow="onHourShowCallback" onMinuteShow="onMinuteShowCallback">
+                        </pe:timePicker>
                         <p:outputLabel value="Room:" for="room" />
                         <p:inputText id="room" value="#{visitBean.newVisit.room}" title="Room" required="true" requiredMessage="The Room field is required."/>
                         <p:outputLabel value="Payment:" for="payment" />
@@ -125,32 +129,25 @@
                     </h:form>
                 </p:dialog>
                 <h:outputScript id="timeRangeScript" target="body">  
-/* <![CDATA[ */  
-    // Use case 2  
-      
-    function onHourShowCallback(hour) {
-    
-        if ((hour > 20) || (hour < 6)) {  
-            return false; // not valid  
-        }  
-          
-        return true; // valid  
-    }  
-      
-    function onMinuteShowCallback(hour, minute) {
-        
-        if ((hour == 20) && (minute >= 30)) {  
-            return false; // not valid  
-        }  
-          
-        if ((hour == 6) && (minute < 30)) {  
-            return false; // not valid  
-        }  
-          
-        return true;  // valid  
-    }   
-/* ]]> */  
-</h:outputScript> 
+                /* <![CDATA[ */  
+                    // Use case 2  
+
+                    function onHourShowCallback(hour) {
+                    
+                        
+
+                        if ((hour > 20) || (hour < 6)) {  
+                            return false; // not valid  
+                        }  
+
+                        return true; // valid  
+                    }  
+
+                    function onMinuteShowCallback(hour, minute) {
+                        #{visitBean.getNextVisitsFree(hour, min)};
+                    }   
+                /* ]]> */  
+                </h:outputScript> 
                 
             </ui:define>
 
