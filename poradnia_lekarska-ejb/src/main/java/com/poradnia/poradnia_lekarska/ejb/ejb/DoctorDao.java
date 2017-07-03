@@ -56,11 +56,10 @@ public class DoctorDao extends AbstractDao<Doctor> {
         }
     }
 
-    public List<Visit> getVisits(Integer id, Date date, int hour, int min) {
+    public List<Visit> getVisits(Integer id, Date date) {
         List<Visit> ut = em.createNamedQuery("Visit.findByDoctorFree",Visit.class)
                     .setParameter("id", id)
                     .setParameter("date", date)
-                    .setParameter("hour", hour)
                     .getResultList();
         return ut;                    
     }

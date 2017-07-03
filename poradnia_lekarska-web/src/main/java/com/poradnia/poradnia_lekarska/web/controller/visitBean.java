@@ -14,6 +14,7 @@ import com.poradnia.poradnia_lekarska.ejb.model.Visit;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
@@ -24,6 +25,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -35,6 +37,7 @@ public class visitBean implements Serializable{
     
     private static Logger logger = Logger.getLogger(visitBean.class.getName());
     private Visit newVisit = new Visit();
+    private boolean doctorFreeHours[][];
     
     
     @EJB
@@ -106,26 +109,39 @@ public class visitBean implements Serializable{
     
     public void DoctorChangeListener(ValueChangeEvent event){
         newVisit.setIdDoctor((Doctor) event.getNewValue());
+        getFreeHours();
         logger.info("Editing visit doctor " + newVisit.getIdDoctor().getId() );
     }
     
-    public void DateChangeListener(ValueChangeEvent event){
-        if(newVisit.getDate()!=null){
-            newVisit.setDate((Date) event.getNewValue());
-            logger.info("Editing date visit " + newVisit.getDate() );
+    public void DateChangeListener(SelectEvent event){
+        if(newVisit!=null){
+            if(newVisit.getDate()!=null){
+                newVisit.setDate((Date) event.getObject());
+                getFreeHours();
+                logger.info("Editing date visit " + newVisit.getDate() );
+            }
         }
     }
     
-    public boolean getNextVisitsFree(int hour, int min){
-        if(newVisit.getIdDoctor()!=null){
-            List<Visit> visits = daod.getVisits(newVisit.getIdDoctor().getId(),newVisit.getDate(),hour,min);
-            logger.info("doctor visits " + visits.toString() );
-            if(visits==null)
-                return true;
-        }
-            
-        return false;
+    private void getFreeHours(){
+        doctorFreeHours = new boolean[24][12];
+        if(newVisit!=null){
+            if(newVisit.getIdDoctor()!=null){
+                List<Visit> visits = daod.find(newVisit.getIdDoctor().getId()).getVisitList();
+
+                for(Visit v: visits){
+                    doctorFreeHours[v.getTime().getHours()][v.getTime().getMinutes()/5] = true;
+                }
+            }
+        }        
     }
+    
+    public boolean[][] getDoctorFreeHours(){
+        if(doctorFreeHours==null)
+            getFreeHours();
+        return doctorFreeHours;
+    }
+    
     
     /**
      * Creates a new instance of visitBean

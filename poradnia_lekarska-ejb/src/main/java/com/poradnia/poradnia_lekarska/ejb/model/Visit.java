@@ -47,7 +47,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "Visit.findByDoctorOn", query = "SELECT v FROM Visit v WHERE v.idDoctor.id = :id AND v.date > :a")
     , @NamedQuery(name = "Visit.findByPatientOff", query = "SELECT v FROM Visit v WHERE v.idPatient.id = :id AND v.date < :a")
     , @NamedQuery(name = "Visit.findByDoctorOff", query = "SELECT v FROM Visit v WHERE v.idDoctor.id = :id AND v.date < :a")
-    , @NamedQuery(name = "Visit.findByDoctorFree", query = "SELECT v FROM Visit v WHERE v.idDoctor.id = :id AND v.date = :date AND FUNC('HOUR',v.time) = :hour")})
+    , @NamedQuery(name = "Visit.findByDoctorFree", query = "SELECT v FROM Visit v WHERE v.idDoctor.id = :id AND v.date = :date")})
 public class Visit implements Serializable {
 
     private static final long serialVersionUID = 1L;
